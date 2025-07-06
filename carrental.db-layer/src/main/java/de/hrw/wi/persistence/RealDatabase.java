@@ -197,11 +197,10 @@ public class RealDatabase implements DatabaseReadInterface, DatabaseWriteInterfa
             //  Statements und ist deshalb möglicherweise anfällig für manche Angriffe. Stellen
             //  Sie die Methode getCarBrand(String carId) auf Prepared Statements um (ignorieren
             //  Sie dabei Meldungen von Checkstyle).
-            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);;
-            // Ersatzkommentar für A5 a): Diesen Kommentar müssen sie ändern
-                String sqlStr = "SELECT brand FROM CARS WHERE id='"  + carId + STR_SINGLEQUOTE_SEMICOLON;;
+            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            String sqlStr = "SELECT brand FROM CARS WHERE id='" + carId + STR_SINGLEQUOTE_SEMICOLON;
             return getString(executeQuery(sqlStr));
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersistenceException(STR_CAR_BRAND_COULD_NOT_BE_READ);
         } finally {
             safeClose(c);
