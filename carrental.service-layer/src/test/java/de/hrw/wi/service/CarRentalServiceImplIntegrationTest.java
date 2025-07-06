@@ -9,9 +9,15 @@ import de.hrw.wi.business.bookings.Booking;
 import de.hrw.wi.databaseSetup.DatabaseConfiguration;
 import de.hrw.wi.persistence.RealDatabase;
 import de.hrw.wi.types.Datum;
+import org.dbunit.Assertion;
+import org.dbunit.IDatabaseTester;
+import org.dbunit.JdbcDatabaseTester;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,12 +74,16 @@ public class CarRentalServiceImplIntegrationTest {
     private static final String PASSWORD = DatabaseConfiguration.getDBPassword();
 
     private CarRentalServiceInterface carRentalService;
+    private IDatabaseTester dbTester;
 
     /**
      * @throws java.lang.Exception
      */
     @BeforeEach
     public void setUp() throws Exception {
+        dbTester = new JdbcDatabaseTester("org.hsqldb.jdbcDriver", DB_URL, USER, PASSWORD);
+        dbTester.setDataSet(new FlatXmlDataSetBuilder().build(new File("db_full_export.xml")));
+        dbTester.onSetup();
         RealDatabase db = new RealDatabase();
         carRentalService = new CarRentalServiceImpl(db, db);
     }
@@ -90,6 +100,9 @@ public class CarRentalServiceImplIntegrationTest {
     public void testAddCar() throws Exception {
         Car car = new Car(BRAND_AUDI, LP_RV_CA_2015);
         boolean status = carRentalService.addCar(car);
+        IDataSet actual = dbTester.getConnection().createDataSet();
+        Assertion.assertEquals(new FlatXmlDataSetBuilder().build(new File("afterinsert.xml")),
+                actual);
         assertTrue(status);
     }
 
