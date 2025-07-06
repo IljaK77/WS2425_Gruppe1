@@ -25,7 +25,7 @@ public class BookingOpen implements BookingState {
      */
     @Override
     public void returnCar() {
-        // TODO Auto-generated method stub
+        this.booking.setState(new CarInReturn(booking));
     }
 
     /**
@@ -33,7 +33,7 @@ public class BookingOpen implements BookingState {
      */
     @Override
     public void closeBooking() {
-        // TODO Auto-generated method stub
+        throw new IllegalStateException();
     }
 
     /**
