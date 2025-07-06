@@ -6,7 +6,10 @@ package de.hrw.wi.service;
 import de.hrw.wi.business.Car;
 import de.hrw.wi.persistence.DatabaseReadInterface;
 import de.hrw.wi.persistence.DatabaseWriteInterface;
+import de.hrw.wi.types.Datum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,6 +17,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Teste CarRentalServiceImpl mit Mocking
@@ -45,11 +49,31 @@ public class CarRentalServiceImplTest {
     private static final Car CAR_RV_HS_111 = new Car(BRAND_PEUGEOT, LP_RV_HS_111);
     Set<String> carsTestData =
             new HashSet<String>(Arrays.asList(CAR_RV_HS_111.getId(), CAR_UL_M_123.getId()));
-
+    private Datum from = new Datum(2025, 1, 31);
+    private Datum till = new Datum(2025, 12, 31);
 
     private CarRentalServiceInterface carRentalService;
     private DatabaseReadInterface dbReadMock;
     private DatabaseWriteInterface dbWriteMock;
+
+    @BeforeEach
+    public void setUp() {
+        dbReadMock = Mockito.mock(DatabaseReadInterface.class);
+        dbWriteMock = Mockito.mock(DatabaseWriteInterface.class);
+        when(dbReadMock.getAllCars()).thenReturn(carsTestData);
+
+        //ab hier nur notwendig
+        when(dbReadMock.getCarBrand(LP_UL_M_123)).thenReturn(BRAND_PORSCHE);
+        when(dbReadMock.getCarBrand(LP_RV_HS_111)).thenReturn(BRAND_PEUGEOT);
+        when(dbReadMock.findAvailableCar(from, till)).thenReturn(carsTestData);
+        when(dbReadMock.isCarAvailable(BRAND_PORSCHE, from, till)).thenReturn(true);
+        when(dbReadMock.isCarAvailable(BRAND_PEUGEOT, from, till)).thenReturn(true);
+        when(dbReadMock.getFirstName("1")).thenReturn("Peter");
+        when(dbReadMock.getFirstName("2")).thenReturn("Hans");
+        //
+        
+        carRentalService = new CarRentalServiceImpl(dbReadMock, dbWriteMock);
+    }
 
     @Test
     public void testGetAllCars() {
